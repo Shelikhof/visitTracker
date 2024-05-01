@@ -1,0 +1,65 @@
+.pop-up-root {
+  min-height: 100dvh;
+  width: 100%;
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pop-up {
+  width: 500px;
+  background: var(--white);
+  padding: 15px;
+  border-radius: 15px;
+}
+
+.pop-up h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+.pop-up-root.pop-up-animatiom-enter {
+  opacity: 0;
+}
+
+.pop-up-root.pop-up-animatiom-enter-active {
+  opacity: 1;
+  transition: all var(--speed);
+}
+
+.pop-up-root.pop-up-animatiom-exit {
+  opacity: 1;
+}
+
+.pop-up-root.pop-up-animatiom-exit-active {
+  opacity: 0;
+  transition: all var(--speed);
+}
+
+.pop-up-animatiom-enter .pop-up {
+  opacity: 0;
+  scale: 0.3;
+}
+
+.pop-up-animatiom-enter-active .pop-up {
+  opacity: 1;
+  scale: 1;
+  transition: all var(--speed);
+}
+
+.pop-up-animatiom-exit .pop-up {
+  scale: 1;
+  opacity: 1;
+}
+
+.pop-up-animatiom-exit-active .pop-up {
+  scale: 0.3;
+  opacity: 0;
+  transition: all var(--speed);
+}

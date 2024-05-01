@@ -1,0 +1,25 @@
+.group-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(300px, 420px));
+  justify-content: space-between;
+  gap: minmax(50px, auto);
+  margin-bottom: 50px;
+}
+
+.save-button {
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.left-side {
+  display: grid;
+  grid-template-rows: 54px max-content;
+  gap: 30px;
+}
+
+@media screen and (max-width: 700px) {
+  .group-wrapper {
+    grid-template-columns: 1fr;
+  }
+}

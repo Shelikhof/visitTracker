@@ -1,0 +1,10 @@
+.summary {
+  max-width: 350px;
+  display: grid;
+  gap: 15px;
+}
+
+.selects {
+  display: flex;
+  gap: 10px;
+}

@@ -1,0 +1,17 @@
+.report {
+  max-width: 350px;
+  margin: 0 auto;
+  display: grid;
+  gap: 30px;
+}
+
+.list {
+  display: grid;
+  gap: 20px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

@@ -1,0 +1,6 @@
+.groups-container {
+  max-width: 650px;
+  grid-template-columns: 1;
+  display: grid;
+  gap: 30px;
+}

@@ -1,0 +1,15 @@
+.form {
+  display: grid;
+  gap: 25px;
+}
+
+.IP {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+}

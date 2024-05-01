@@ -1,0 +1,17 @@
+.form {
+  display: grid;
+  gap: 25px;
+}
+
+.role {
+  display: flex;
+}
+
+.role p {
+  margin-right: 30px;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+}

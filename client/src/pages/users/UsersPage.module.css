@@ -1,0 +1,10 @@
+.users-container {
+  max-width: 550px;
+  grid-template-columns: 1;
+  display: grid;
+  gap: 30px;
+}
+
+.users-search {
+  max-width: 350px;
+}

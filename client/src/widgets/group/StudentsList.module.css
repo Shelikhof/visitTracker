@@ -1,0 +1,37 @@
+.student-item {
+  display: grid;
+  grid-template-columns: 65% 25px 64px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.item-button {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+}
+
+.students-list {
+  display: grid;
+  gap: 18px;
+}
+
+.buttons {
+  display: grid;
+  gap: 15px;
+}
+
+.students-list-wrapper {
+  display: grid;
+  grid-template-rows: max-content auto;
+  align-items: start;
+  gap: 30px;
+}
