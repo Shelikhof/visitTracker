@@ -40,6 +40,7 @@ export class RolesGuard implements CanActivate {
 
       const userJwtData = this.tokenService.validateToken(token);
       req.body.userJwtData = userJwtData;
+      req.userJwtData = userJwtData;
       return requiredRoles.includes(userJwtData.role);
     } catch (error) {
       console.log(error);

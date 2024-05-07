@@ -30,7 +30,7 @@ export class VisitingsService {
     );
 
     const { startDay, endDay } = this.getTodayStartEnd();
-
+    log(startDay, endDay);
     //получение всех посещений группы за день
     const visitings = await this.visitingRepository.findAll({
       where: {
@@ -51,12 +51,15 @@ export class VisitingsService {
         });
 
         visiting.isVisit = student.isVisit;
+        visiting.isRespectfulReason =
+          !student.isVisit && student.isRespectfulReason;
         await visiting.save();
       }
     } else {
       for (const student of createVisitingDto.students) {
         await this.visitingRepository.create({
           isVisit: student.isVisit,
+          isRespectfulReason: !student.isVisit && student.isRespectfulReason,
           date: this.getTodayWithTimeZone(),
           studentId: student.id,
           groupId: group.id,
@@ -102,12 +105,14 @@ export class VisitingsService {
 
     const { startDay, endDay } = this.getTodayStartEnd();
 
+    log(startDay, endDay);
+
     const visitings = await this.visitingRepository.findAll({
       where: {
         groupId: group.id,
         date: { [Op.between]: [startDay, endDay] },
       },
-      include: [{ model: Student, attributes: ['id', 'fullName'] }],
+      include: [{ model: Student, attributes: ['id', 'fullName', 'isIP'] }],
       raw: true,
     });
 
@@ -118,6 +123,8 @@ export class VisitingsService {
           id: item['student.id'],
           fullName: item['student.fullName'],
           isVisit: !!item.isVisit,
+          isRespectfulReason: !!item.isRespectfulReason,
+          isIP: !!item['student.isIP'],
         }))
         .sort((a, b) => a.fullName.localeCompare(b.fullName));
       return {
@@ -131,7 +138,9 @@ export class VisitingsService {
       .map((student) => ({
         id: student.id,
         fullName: student.fullName,
+        isIP: !!student.isIP,
         isVisit: true,
+        isRespectfulReason: null,
       }))
       .sort((a, b) => a.fullName.localeCompare(b.fullName));
 
@@ -154,6 +163,7 @@ export class VisitingsService {
     const days = this.getDaysOfMonth(month, year);
     const { firstDay, lastDay } = this.getFirstAndLastDayOfMonth(month, year);
 
+    //получение посещений группы за месяц
     const studentsVisitings = {};
 
     //получение всех посещений группы за месяц
@@ -178,7 +188,11 @@ export class VisitingsService {
           if (visitings[visitingsIndex]?.isVisit == null) {
             return `--`;
           }
-          const value = !!visitings[visitingsIndex].isVisit;
+          const value = !!visitings[visitingsIndex].isVisit
+            ? 'О'
+            : !!visitings[visitingsIndex].isRespectfulReason
+              ? 'УП'
+              : 'Н';
           visitingsIndex += 1;
           return value;
         } else {
@@ -210,9 +224,7 @@ export class VisitingsService {
       studentsVisitings,
     };
 
-    const buffer = await this.generateSummaryTable(res as ICreateSummary);
-
-    return buffer;
+    return res;
   }
 
   //получить группу пользователя по его роли и id
@@ -237,18 +249,19 @@ export class VisitingsService {
   }
 
   private getTodayStartEnd() {
-    const today = new Date();
+    const today = this.getTodayWithTimeZone();
+    log(today);
     const startDay = new Date(
       today.getFullYear(),
       today.getMonth(),
       today.getDate() + 0,
-      today.getHours() + Number(process.env.TIMEZONE) - 1,
+      Number(process.env.TIMEZONE) % 24,
     );
     const endDay = new Date(
       today.getFullYear(),
       today.getMonth(),
       today.getDate() + 1,
-      today.getHours() + Number(process.env.TIMEZONE) - 1,
+      Number(process.env.TIMEZONE) % 24,
     );
     return { startDay, endDay };
   }
@@ -286,8 +299,12 @@ export class VisitingsService {
     return { firstDay, lastDay };
   }
 
-  private async generateSummaryTable(data: ICreateSummary) {
-    const { dateData, studentsVisitings, group } = data;
+  async generateSummaryTable(userJwtData, month: string, year: string) {
+    const { dateData, studentsVisitings, group } = await this.getSummary(
+      userJwtData,
+      month,
+      year,
+    );
 
     const tableTemplate = new exceljs.Workbook();
     await tableTemplate.xlsx.readFile(
@@ -295,12 +312,12 @@ export class VisitingsService {
     );
 
     const worksheet = tableTemplate.getWorksheet('шаблон');
-    worksheet.name = dateData.month;
+    worksheet.name = this.monthEnum[dateData.month];
 
     worksheet.getCell(1, 3).value =
       `Отделение "Ярославское-3" по адресу: Хибиннский проезд, дом 11`;
     worksheet.getCell(2, 1).value =
-      `                                                                                                         Табель учета питания группы № ${group.name}                                            ${this.monthEnum[dateData.month]} ${dateData.year}г.`;
+      `                                                                                                      Табель учета питания группы № ${group.name}                                            ${this.monthEnum[dateData.month]} ${dateData.year}г.`;
 
     worksheet.getCell(34, 2).value =
       `   Куратор                         _____________________________________             ${this.formatName(group.curator)}																	    `;
@@ -325,7 +342,7 @@ export class VisitingsService {
 
       studentsVisitings[student].forEach((item, index) => {
         if (item !== '--')
-          worksheet.getCell(currentRow, index + 3).value = item ? 'О' : 'Н';
+          worksheet.getCell(currentRow, index + 3).value = item;
       });
       currentRow += 1;
     }
@@ -361,33 +378,40 @@ export class VisitingsService {
   }
 
   generateVisitingMessage(
-    students: IVisitingStudent[],
+    studentsVisitings: IVisitingStudent[],
     groupName: string,
     studentsData: Student[],
   ) {
     const date = this.getTodayWithTimeZone();
-    const formatedDate = `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth()).padStart(2, '0')}.${date.getFullYear()}`;
-
-    log(studentsData);
+    log(date + 'asdasd');
+    const formatedDate = `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
 
     const IP = [];
-    const nonIP = [];
+    const respReason = [];
+    const nonRespReason = [];
 
-    const visitCount = students.reduce(
-      (acc, _, i) => (students[i].isVisit ? acc + 1 : acc),
+    const visitCount = studentsVisitings.reduce(
+      (acc, _, i) => (studentsVisitings[i].isVisit ? acc + 1 : acc),
       0,
     );
 
-    for (const student of students) {
+    for (const student of studentsVisitings) {
       if (student.isVisit) continue;
 
       const index = studentsData.findIndex((item) => item.id === student.id);
 
-      if (studentsData[index].isIP) IP.push(studentsData[index].fullName);
-      else nonIP.push(studentsData[index].fullName);
+      if (studentsData[index].isIP) {
+        IP.push(studentsData[index].fullName);
+        continue;
+      }
+      const visit = studentsVisitings.findIndex((el) => el.id === student.id);
+
+      if (studentsVisitings[visit].isRespectfulReason)
+        respReason.push(studentsData[index].fullName);
+      else nonRespReason.push(studentsData[index].fullName);
     }
 
-    const message = `\n${formatedDate}\n№ группы ${groupName}\nПо списку: ${students.length}\nПрисутствует: ${visitCount}\nОтсутствуют: ${nonIP.join(' , ') || '—'}\nОтсутствуют ИП: ${IP.join(' , ') || '—'}
+    const message = `\n${formatedDate}\n№ группы ${groupName}\nПо списку: ${studentsVisitings.length}\nПрисутствует: ${visitCount}\nОтсутствуют по УП: ${respReason.join(' , ') || '—'}\nОтсутствуют: ${nonRespReason.join(' , ') || '—'}\nОтсутствуют ИП: ${IP.join(' , ') || '—'}
     `;
 
     return message;

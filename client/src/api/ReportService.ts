@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import $api from ".";
-import { IReportResponse, IReportStudent } from "./interfaces/IReportService.interface";
+import { IReportResponse, IReportStudent, ISummaryData } from "./interfaces/IReportService.interface";
 
 export default class ReportService {
   static async getReport() {
@@ -13,7 +13,7 @@ export default class ReportService {
     return response.data;
   }
 
-  static async getSummary(month: string, year: string): Promise<AxiosResponse<ArrayBuffer>> {
+  static async getSummaryFile(month: string, year: string): Promise<AxiosResponse<ArrayBuffer>> {
     const response = await $api.get("/summary", {
       params: {
         month,
@@ -22,5 +22,15 @@ export default class ReportService {
       responseType: "arraybuffer",
     });
     return response;
+  }
+
+  static async getSummaryData(month: string, year: string) {
+    const response = await $api.get<ISummaryData>("/summaryData", {
+      params: {
+        month,
+        year,
+      },
+    });
+    return response.data;
   }
 }

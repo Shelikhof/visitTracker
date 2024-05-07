@@ -3,6 +3,7 @@ import { Button, Select } from "../../UI";
 import { MONTH } from "../../variables/month";
 import styles from "./Summary.module.css";
 import ReportService from "../../api/ReportService";
+import useSummaryParamsStore from "../../store/summaryParams.store";
 
 interface ISelectItem {
   id: string;
@@ -10,6 +11,7 @@ interface ISelectItem {
 }
 
 const Summary = () => {
+  const setSummaryParams = useSummaryParamsStore((state) => state.setSummaryParams);
   const date = new Date();
   const YEARS = [
     { id: String(date.getFullYear() - 1), value: String(date.getFullYear() - 1) },
@@ -19,8 +21,12 @@ const Summary = () => {
   const [month, setMonth] = React.useState<ISelectItem>(MONTH[date.getMonth()]);
   const [year, setYear] = React.useState<ISelectItem>(YEARS[1]);
 
+  React.useEffect(() => {
+    setSummaryParams(month.id, year.id);
+  }, [month, year]);
+
   const handleClick = async () => {
-    const buffer = await ReportService.getSummary(month.id, year.id);
+    const buffer = await ReportService.getSummaryFile(month.id, year.id);
     const blob = new Blob([buffer.data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 
     const url = window.URL.createObjectURL(blob);
@@ -35,11 +41,9 @@ const Summary = () => {
 
   return (
     <div className={styles["summary"]}>
-      <div className={styles["selects"]}>
-        <Select options={MONTH} onChange={setMonth} value={month} />
-        <Select options={YEARS} onChange={setYear} value={year} />
-      </div>
-      <Button onClick={handleClick}>Выгрузить в excel</Button>
+      <Select options={MONTH} onChange={setMonth} value={month} />
+      <Select options={YEARS} onChange={setYear} value={year} />
+      <Button onClick={handleClick}>Выгрузить в Excel</Button>
     </div>
   );
 };

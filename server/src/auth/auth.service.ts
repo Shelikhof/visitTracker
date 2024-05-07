@@ -70,6 +70,10 @@ export class AuthService {
   //получение данных пользователя по токену
   async getMe(id: string) {
     const user = await this.usersService.findByPk(id);
-    return { role: user.role, username: user.username };
+    return {
+      role: user.role,
+      username: user.username,
+      fullName: user.fullName,
+    };
   }
 }

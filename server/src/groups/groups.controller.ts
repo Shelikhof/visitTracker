@@ -8,6 +8,10 @@ import {
   Delete,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+  Req,
 } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
@@ -15,6 +19,7 @@ import { EditGroupDto, UpdateGroupDto } from './dto/update-group.dto';
 import { Roles } from 'src/auth/roles-auth.decorator';
 import { RolesGuard } from 'src/auth/role.guard';
 import { log } from 'console';
+import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('groups')
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
@@ -72,5 +77,17 @@ export class GroupsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.groupsService.remove(id);
+  }
+
+  //загрузка студентов из файла
+  @Roles('curator')
+  @UseGuards(RolesGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('uploadFile')
+  async uploadNewStudentsFromFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: any,
+  ) {
+    return this.groupsService.addNewStudentsFromFile(file, req.userJwtData.id);
   }
 }

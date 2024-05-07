@@ -1,0 +1,8 @@
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.add-file {
+  margin-bottom: 25px;
+}

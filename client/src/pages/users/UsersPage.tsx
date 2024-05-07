@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import UserService from "../../api/UserService";
 import { Layout } from "../../components";
 import React from "react";
@@ -23,6 +23,7 @@ const UsersPage = () => {
     initialPageParam: 1,
   });
 
+  document.title = "Список пользователей";
   return (
     <Layout header="Список пользователей">
       <div className={styles["users-container"]}>

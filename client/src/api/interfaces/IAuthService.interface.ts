@@ -1,6 +1,7 @@
 import { role } from "./IUserService.interface";
 
 export interface IAuthResponse {
+  fullName: string;
   username: string;
   role: role;
 }

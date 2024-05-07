@@ -27,6 +27,7 @@ const GroupsPage = () => {
     initialPageParam: 1,
   });
 
+  document.title = "Список групп";
   return (
     <Layout header="Список групп">
       <div className={styles["groups-container"]}>

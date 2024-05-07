@@ -4,6 +4,7 @@ import { Roles } from "../variables/menu";
 import { IAuthResponse } from "../api/interfaces/IAuthService.interface";
 
 export interface IUserData {
+  fullName: string;
   username: string;
   role: Roles;
 }
@@ -21,6 +22,7 @@ const useUserDataStore = create<IUserDataState>()(
         userData: {
           role: userData?.role || "none",
           username: userData?.username || "username",
+          fullName: userData?.fullName || "",
         },
       })),
   }))

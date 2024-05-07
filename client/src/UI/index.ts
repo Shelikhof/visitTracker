@@ -6,3 +6,5 @@ export * from "./Search";
 export * from "./PopUp";
 export * from "./SearchDebounce";
 export * from "./Error";
+export * from "./forms/AddFile";
+export * from "./forms/Checkbox";

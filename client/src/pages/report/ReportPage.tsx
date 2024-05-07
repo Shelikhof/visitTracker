@@ -6,6 +6,7 @@ import getStringData from "../../utils/getStringDate";
 const ReportPage = () => {
   const [date, setDate] = React.useState(new Date());
 
+  document.title = `Составление отчёта ${getStringData(date)}`;
   return (
     <Layout header={`Составление отчёта ${getStringData(date)}`} alignHeader="center">
       <Report setDate={setDate} />

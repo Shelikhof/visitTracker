@@ -6,5 +6,23 @@ export interface IReportResponse {
 export interface IReportStudent {
   id: string;
   fullName: string;
+  isIP: boolean;
   isVisit: boolean;
+  isRespectfulReason: boolean | null;
+}
+
+export interface ISummaryData {
+  dateData: {
+    dayCount: number;
+    days: number[];
+    firstDay: Date;
+    lastDay: Date;
+    month: string;
+    year: string;
+  };
+  group: {
+    name: string;
+    curator: string;
+  };
+  studentsVisitings: { [key: string]: string[] };
 }

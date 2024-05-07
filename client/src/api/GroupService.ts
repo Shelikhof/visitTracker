@@ -42,4 +42,16 @@ export default class GroupService {
     const response = await $api.patch("/groups/edit", { name, praepostors, students });
     return response.data;
   }
+
+  static async uploadStudentFromFile(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await $api.post("/groups/uploadFile", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response;
+  }
 }

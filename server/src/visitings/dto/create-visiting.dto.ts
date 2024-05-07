@@ -10,4 +10,6 @@ export interface IVisitingStudent {
   id: string;
   fullName: string;
   isVisit: boolean;
+  isRespectfulReason: boolean;
+  isIP: boolean;
 }

@@ -28,4 +28,9 @@ export default class UserService {
     const response = await $api.patch(`/users/${id}`, { role, fullName });
     return response.data;
   }
+
+  static async changeName(fullName: string) {
+    const response = await $api.patch(`/users/changeName`, { fullName });
+    return response;
+  }
 }

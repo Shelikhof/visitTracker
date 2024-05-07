@@ -111,4 +111,12 @@ export class UsersService {
     await user.save();
     return user;
   }
+
+  async changeFullName(id: string, fullName: string) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) throw new BadRequestException('user not found');
+    user.fullName = fullName;
+    await user.save();
+    return;
+  }
 }

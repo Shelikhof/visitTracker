@@ -1,20 +1,24 @@
 import React from "react";
-import { IStudent } from "../../api/interfaces/IGroupService.interface";
+import { IGetGroupInfoResponse, IStudent } from "../../api/interfaces/IGroupService.interface";
 import { Button } from "../../UI";
 import { StudentPopUp } from "./StudentPopUp";
 import { dynamicSliceString } from "../../utils/sliceString";
 import styles from "./StudentsList.module.css";
 import { SubmitActionPopUp } from "../SubmitActionPopUp";
+import { AddStudentFilePopUp } from "./AddStudentFilePopUp";
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 
 interface IStudentsListProps {
   students: IStudent[] | null;
   setStudents: (value: IStudent[] | null) => void;
+  refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<IGetGroupInfoResponse, Error>>;
 }
 
-const StudentsList: React.FC<IStudentsListProps> = ({ setStudents, students = [] }) => {
+const StudentsList: React.FC<IStudentsListProps> = ({ setStudents, refetch, students = [] }) => {
   const [isOpenStudentPopUp, setIsOpenStudentPopUp] = React.useState(false);
-  const [currentStudent, setCurrentStudent] = React.useState<IStudent | null>(null);
   const [isOpenDeleteStudentPopUp, setIsOpenDeleteStudentPopUp] = React.useState(false);
+  const [isOpenAddStudentFilePopUp, setIsOpenAddStudentFilePopUp] = React.useState(false);
+  const [currentStudent, setCurrentStudent] = React.useState<IStudent | null>(null);
 
   React.useEffect(() => {
     if (!isOpenStudentPopUp && !isOpenDeleteStudentPopUp) setCurrentStudent(null);
@@ -46,6 +50,7 @@ const StudentsList: React.FC<IStudentsListProps> = ({ setStudents, students = []
 
   return (
     <>
+      <AddStudentFilePopUp isOpen={isOpenAddStudentFilePopUp} setIsOpen={setIsOpenAddStudentFilePopUp} refetch={refetch} />
       <SubmitActionPopUp
         isOpen={isOpenDeleteStudentPopUp}
         setIsOpen={setIsOpenDeleteStudentPopUp}
@@ -56,9 +61,7 @@ const StudentsList: React.FC<IStudentsListProps> = ({ setStudents, students = []
       <div className={styles["students-list-wrapper"]}>
         <div className={styles["buttons"]}>
           <Button onClick={() => setIsOpenStudentPopUp(true)}>Добавить студента</Button>
-          <Button disabled onClick={() => {}}>
-            Загрузить из файла
-          </Button>
+          <Button onClick={() => setIsOpenAddStudentFilePopUp(true)}>Загрузить из файла</Button>
         </div>
         {students && (
           <ul className={styles["students-list"]}>

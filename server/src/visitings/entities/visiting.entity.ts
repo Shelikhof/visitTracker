@@ -12,6 +12,7 @@ import { Student } from 'src/groups/entities/student.entity';
 interface ICreateVisiting {
   studentId: string;
   isVisit: boolean;
+  isRespectfulReason: boolean;
   groupId: string;
   date?: Date;
 }
@@ -33,6 +34,13 @@ export class Visiting extends Model<Visiting, ICreateVisiting> {
     defaultValue: true,
   })
   isVisit: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+    defaultValue: null,
+  })
+  isRespectfulReason: boolean;
 
   @Column({
     type: DataType.DATE,

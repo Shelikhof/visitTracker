@@ -24,7 +24,7 @@ function App() {
   const [isLoading, setIsLoading] = React.useState(true);
 
   const setData = (data: any) => {
-    setUserData({ role: data?.role, username: data?.username });
+    setUserData({ role: data?.role, username: data?.username, fullName: data?.fullName });
   };
 
   const fetchData = async () => {

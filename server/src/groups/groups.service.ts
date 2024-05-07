@@ -11,6 +11,7 @@ import { Praepostor } from './entities/praepostor.entity';
 import { Student } from './entities/student.entity';
 import { BotService } from 'src/bot/bot.service';
 import { log } from 'console';
+import * as exceljs from 'exceljs';
 
 @Injectable()
 export class GroupsService {
@@ -314,6 +315,45 @@ export class GroupsService {
     }
     return;
   }
+
+  async addNewStudentsFromFile(file: Express.Multer.File, curatorId: string) {
+    const workbook = new exceljs.Workbook();
+
+    await workbook.xlsx.load(file.buffer);
+
+    const worksheet = workbook.getWorksheet(1);
+
+    const studentsFromFile = [];
+
+    for (let i = 2; i <= worksheet.rowCount; i++) {
+      const student = worksheet.getCell(i, 1).value;
+      studentsFromFile.push(student);
+    }
+
+    const group = await this.groupRepository.findOne({
+      where: { curatorId },
+      raw: true,
+    });
+    if (!group) throw new BadRequestException('group not found');
+
+    const students = await this.studentRepository.findAll({
+      where: { groupId: group.id },
+      raw: true,
+    });
+
+    if (students.length + studentsFromFile.length > 25)
+      throw new BadRequestException('too many students');
+
+    for (const student of studentsFromFile) {
+      const newStudent = await this.studentRepository.create({
+        groupId: group.id,
+        fullName: student,
+      });
+    }
+
+    return;
+  }
+
   private compareArrays(arr1, arr2) {
     const intersection = arr1.filter((item1) =>
       arr2.some((item2) => item1.id === item2.id),

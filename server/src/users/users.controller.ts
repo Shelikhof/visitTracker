@@ -16,6 +16,8 @@ import { TokenGuard } from 'src/auth/token.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RolesGuard } from 'src/auth/role.guard';
 import { Roles } from 'src/auth/roles-auth.decorator';
+import { ChangeNameDto } from './dto/change-name.dto';
+import { log } from 'console';
 
 @Controller('users')
 export class UsersController {
@@ -59,5 +61,11 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @UseGuards(TokenGuard)
+  @Patch('changeName')
+  changeName(@Body() body: ChangeNameDto) {
+    return this.usersService.changeFullName(body.userJwtData.id, body.fullName);
   }
 }

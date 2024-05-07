@@ -17,53 +17,10 @@ const GroupPage = () => {
   const [praepostors, setPraepostors] = React.useState<IPraepostor[] | null>(null);
   const [students, setStudents] = React.useState<IStudent[] | null>(null);
 
-  const praep = [
-    {
-      id: "1",
-      fullName: "Иванов Иван Иванович",
-      username: "username",
-    },
-    {
-      id: "2",
-      fullName: "не вано",
-      username: "username",
-    },
-  ];
-
-  const studen = [
-    {
-      id: "1",
-      fullName: "Иванов1 Иван1 Иванович1",
-      isIP: true,
-    },
-    {
-      id: "2",
-      fullName: "Иванов2 Иван2 Иванович2",
-      isIP: false,
-    },
-    {
-      id: "3",
-      fullName: "Иванов3 Иван3 Иванович3",
-      isIP: false,
-    },
-    {
-      id: "4",
-      fullName: "Иванов4 Иван4 Иванович4",
-      isIP: true,
-    },
-    {
-      id: "5",
-      fullName: "Иванов5 Иван5 Иванович5",
-      isIP: false,
-    },
-  ];
-
   React.useEffect(() => {
     setGroupName(data?.name || "");
     setPraepostors(data?.praepostors || null);
-    // setPraepostors(praep);
     setStudents(data?.students || null);
-    // setStudents(studen);
   }, [isFetching]);
 
   const saveGroup = async () => {
@@ -71,6 +28,7 @@ const GroupPage = () => {
     refetch();
   };
 
+  document.title = `Группа ${data?.name || ""}`;
   return (
     <Layout header={`Группа ${data?.name || ""}`}>
       <div className={styles["group-wrapper"]}>
@@ -78,7 +36,7 @@ const GroupPage = () => {
           <Input value={groupName} setValue={setGroupName} placeholder="Название группы" />
           <PraepostorsList praepostors={praepostors || []} setPraepostors={setPraepostors} />
         </div>
-        <StudentsList students={students || []} setStudents={setStudents} />
+        <StudentsList students={students || []} setStudents={setStudents} refetch={refetch} />
       </div>
       <div className={styles["save-button"]}>
         <Button onClick={saveGroup} disabled={groupName ? false : true}>

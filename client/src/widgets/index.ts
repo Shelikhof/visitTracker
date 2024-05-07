@@ -14,3 +14,6 @@ export * from "./group/StudentsList";
 export * from "./group/StudentPopUp";
 export * from "./report/Report";
 export * from "./report/Summary";
+export * from "./group/AddStudentFilePopUp";
+export * from "./report/SummaryTable";
+export * from "./menu/ChangeNamePopUp";
