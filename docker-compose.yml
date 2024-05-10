@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  # Frontend (React + Vite)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: client-visittracker
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+
+  # Backend (NestJS)
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: server-visittracker
+    env_file:
+      - ./server/.env
+    ports:
+      - "8080:8080"
+    restart: always
+    command: npm run start
+
+  # Database
+  mysql:
+    container_name: database-mysql-visittracker
+    image: mysql:latest
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "0vSy9U74x7cp"
+      MYSQL_DATABASE: "visittracker"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    restart: always
+
+volumes:
+  mysqldata:

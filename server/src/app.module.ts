@@ -20,7 +20,7 @@ import { BotModule } from './bot/bot.module';
       dialect: 'mysql',
       host: process.env.MYSQL_HOST,
       port: Number(process.env.MYSQL_PORT),
-      username: process.env.MYSQL_USER,
+      username: 'root',
       password: process.env.MYSQL_ROOT_PASSWORD,
       database: process.env.MYSQL_DATABASE,
       models: [User, Group, Praepostor, Student, Visiting],

@@ -4,11 +4,13 @@ import { Button, Input } from "../../UI";
 import useTgDataStore from "../../store/tgData.store";
 import AuthService from "../../api/AuthService";
 import useRedirectOnDefaultPage from "../../hooks/useRedirectOnDefaultPage";
+import useUserDataStore from "../../store/userData.store";
 
 const FillNameForm = () => {
   const [name, setName] = React.useState("");
   const tgData = useTgDataStore((state) => state.tgData);
   const { redirect, navigate } = useRedirectOnDefaultPage();
+  const setUserData = useUserDataStore((state) => state.setUserData);
   const handleClick = async () => {
     if (!tgData) {
       navigate("/login");
@@ -16,7 +18,8 @@ const FillNameForm = () => {
     }
     try {
       const data = await AuthService.login(tgData, name);
-      redirect();
+      setUserData(data);
+      redirect(data);
     } catch (error) {}
   };
 

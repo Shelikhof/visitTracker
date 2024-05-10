@@ -8,7 +8,6 @@ import {
   Delete,
   UseGuards,
   Query,
-  Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -49,6 +48,13 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @UseGuards(TokenGuard)
+  @Patch('changeName')
+  changeName(@Body() body: ChangeNameDto) {
+    log(body);
+    return this.usersService.changeFullName(body.userJwtData.id, body.fullName);
+  }
+
   @Roles('admin')
   @UseGuards(RolesGuard)
   @Patch(':id')
@@ -61,11 +67,5 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
-  }
-
-  @UseGuards(TokenGuard)
-  @Patch('changeName')
-  changeName(@Body() body: ChangeNameDto) {
-    return this.usersService.changeFullName(body.userJwtData.id, body.fullName);
   }
 }

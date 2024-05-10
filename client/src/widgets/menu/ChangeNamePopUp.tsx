@@ -25,7 +25,9 @@ const ChangeNamePopUp: React.FC<IChangeNamePopUpProps> = ({ isOpen, setIsOpen })
     <PopUp isOpen={isOpen} setIsOpen={setIsOpen} title="Изменить ФИО">
       <Input setValue={setFullName} value={fullName} />
       <div className={styles["buttons"]}>
-        <Button onClick={() => setIsOpen(false)}>Отмена</Button>
+        <Button variant="gray" onClick={() => setIsOpen(false)}>
+          Отмена
+        </Button>
         <Button onClick={handleSubmit} disabled={!fullName}>
           Подтвердить
         </Button>

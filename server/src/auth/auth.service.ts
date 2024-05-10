@@ -25,6 +25,7 @@ export class AuthService {
         userData: {
           username: candidateUser.username,
           role: candidateUser.role,
+          fullName: candidateUser.fullName,
         },
       };
     }
@@ -42,7 +43,11 @@ export class AuthService {
     });
     return {
       tokens: this.tokenService.generateToken({ id: user.id, role: user.role }),
-      userData: { username: user.username, role: user.role },
+      userData: {
+        username: user.username,
+        role: user.role,
+        fullName: user.fullName,
+      },
     };
   }
 

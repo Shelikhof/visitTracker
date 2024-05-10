@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { TokenService } from './token.service';
 import { Observable } from 'rxjs';
+import { log } from 'console';
 
 @Injectable()
 export class TokenGuard implements CanActivate {
@@ -21,9 +22,8 @@ export class TokenGuard implements CanActivate {
       const authHeader = req.headers.authorization;
       const bearer = authHeader.split(' ')[0];
       const token = authHeader.split(' ')[1];
-      if (bearer !== 'Bearer' || !token) {
+      if (bearer !== 'Bearer' || !token)
         throw new UnauthorizedException('Not authorized');
-      }
       //проверка подлинности токена
       const userJwtData = this.tokenService.validateToken(token);
       req.body.userJwtData = userJwtData;

@@ -12,7 +12,7 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* <ChangeNamePopUp isOpen={isOpenChangeNamePopUp} setIsOpen={setIsOpenChangeNamePopUp} /> */}
+      <ChangeNamePopUp isOpen={isOpenChangeNamePopUp} setIsOpen={setIsOpenChangeNamePopUp} />
       <MobileMenu />
       <aside className={styles["sidebar"]}>
         <nav className={styles["menu"]}>
