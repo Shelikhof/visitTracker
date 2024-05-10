@@ -27,7 +27,7 @@ const EditUserPopUp: React.FC<IEditUserPopUpProps> = ({ isOpen, setIsOpen, user,
 
   const handleSubmit = async () => {
     try {
-      const data = await UserService.updateUser(user?.id || "", fullName, isAdmin ? "admin" : "none");
+      await UserService.updateUser(user?.id || "", fullName, isAdmin ? "admin" : "none");
       query.refetch();
       setIsOpen(false);
     } catch (error) {

@@ -11,7 +11,7 @@ const useSummaryParamsStore = create<ISummaryParamsState>()(
   devtools((set) => ({
     month: null,
     year: null,
-    setSummaryParams: (month, year) => set((state) => ({ month, year })),
+    setSummaryParams: (month, year) => set(() => ({ month, year })),
   }))
 );
 

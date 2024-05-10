@@ -24,7 +24,7 @@ const GroupPage = () => {
   }, [isFetching]);
 
   const saveGroup = async () => {
-    const data = await GroupService.editGroupInfo(groupName, praepostors, students);
+    await GroupService.editGroupInfo(groupName, praepostors, students);
     refetch();
   };
 

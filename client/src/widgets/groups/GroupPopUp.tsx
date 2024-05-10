@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button, Input, PopUp, SearchDebounce, Error } from "../../UI";
 import UserService from "../../api/UserService";
 import styles from "./GroupPopUp.module.css";
@@ -45,9 +45,9 @@ const GroupPopUp: React.FC<IGroupPopUpProps> = ({ isOpen, setIsOpen, groupId, qu
   const onSubmit = async () => {
     try {
       if (groupId) {
-        const data = await GroupService.updateGroup(groupId, formData.name, formData.curatorId);
+        await GroupService.updateGroup(groupId, formData.name, formData.curatorId);
       } else {
-        const data = await GroupService.createGroup(formData.name, formData.curatorId);
+        await GroupService.createGroup(formData.name, formData.curatorId);
       }
       closePopUp();
     } catch (error) {

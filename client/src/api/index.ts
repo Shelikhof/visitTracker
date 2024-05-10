@@ -21,7 +21,7 @@ $api.interceptors.response.use(
     if (error.response.status === 401 && error.config && !error._isRetry) {
       originalRequest._isRetry = true;
       try {
-        const response = await AuthService.refresh();
+        await AuthService.refresh();
         return $api.request(originalRequest);
       } catch (e) {
         if (window.location.href.split("/")[3] == "login") return;

@@ -1,9 +1,9 @@
 import React, { ChangeEvent } from "react";
-import { Button, Input, PopUp, Search, SearchDebounce, Select, Switch } from "../UI";
+import { Button, Input, PopUp, Select, Switch } from "../UI";
 
-import UserService from "../api/UserService";
+// import UserService from "../api/UserService";
 import { MONTH } from "../variables/month";
-import axios from "axios";
+// import axios from "axios";
 import $api from "../api";
 import { Checkbox } from "../UI/forms/Checkbox";
 
@@ -13,19 +13,19 @@ const DevPage = () => {
   const [value2, setValue2] = React.useState(false);
   const [value3, setValue3] = React.useState(false);
   const onChange = () => setValue2((value2) => !value2);
-  const onSearch = (searchValue: string) => {
-    // console.log(searchValue);
-  };
+  // const onSearch = (searchValue: string) => {
+  //   // console.log(searchValue);
+  // };
 
   const [month, setMonth] = React.useState(MONTH[0]);
   const [isOpenPopUp, setIsOpenPopUp] = React.useState(false);
-  const fetchData = async (value: string) => {
-    const data = await UserService.getAllUsers(1, 10, null, value);
-    // return data.data.data;
-  };
-  const onClick2 = (value: string) => {
-    // console.log(value);
-  };
+  // const fetchData = async (value: string) => {
+  //   const data = await UserService.getAllUsers(1, 10, null, value);
+  // return data.data.data;
+  // };
+  // const onClick2 = (value: string) => {
+  //   // console.log(value);
+  // };
 
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
 
@@ -82,7 +82,7 @@ const DevPage = () => {
       <br />
       <br />
       <br />
-      <Search onSearch={onSearch} placeholder="Поиск" />
+      {/* <Search onSearch={onSearch} placeholder="Поиск" /> */}
       <br />
       <br />
       <br />

@@ -18,7 +18,7 @@ const useUserDataStore = create<IUserDataState>()(
   devtools((set) => ({
     userData: null,
     setUserData: (userData: IAuthResponse | null) =>
-      set((state) => ({
+      set(() => ({
         userData: {
           role: userData?.role || "none",
           username: userData?.username || "username",

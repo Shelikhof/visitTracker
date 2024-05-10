@@ -10,7 +10,7 @@ interface ITgDataState {
 const useTgDataStore = create<ITgDataState>()(
   devtools((set) => ({
     tgData: null,
-    setTgData: (tgData: IAuthRequest) => set((state) => ({ tgData: tgData.userData })),
+    setTgData: (tgData: IAuthRequest) => set(() => ({ tgData: tgData.userData })),
   }))
 );
 

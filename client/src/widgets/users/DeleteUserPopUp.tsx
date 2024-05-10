@@ -13,7 +13,7 @@ interface IDeleteUserPopUpProps {
 
 const DeleteUserPopUp: React.FC<IDeleteUserPopUpProps> = ({ isOpen, setIsOpen, user, query }) => {
   const handleDelete = async () => {
-    const data = await UserService.deleteUser(user?.id || "");
+    await UserService.deleteUser(user?.id || "");
     query.refetch();
     setIsOpen(false);
   };
