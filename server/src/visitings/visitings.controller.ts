@@ -7,6 +7,7 @@ import {
   Query,
   Header,
   Res,
+  Param,
 } from '@nestjs/common';
 import { VisitingsService } from './visitings.service';
 import { CreateVisitingDto } from './dto/create-visiting.dto';
@@ -28,9 +29,9 @@ export class VisitingsController {
 
   @Roles('curator', 'praepostor')
   @UseGuards(RolesGuard)
-  @Get('/report')
-  getReport(@Body() body) {
-    return this.visitingsService.getReport(body.userJwtData);
+  @Get('/report/:id')
+  getReport(@Param('id') id: string) {
+    return this.visitingsService.getReport(id);
   }
 
   //получение файла таблицы сводки
@@ -43,11 +44,11 @@ export class VisitingsController {
     @Res() res: Response,
     @Body() body,
   ) {
-    log(body.userJwtData);
     let data = await this.visitingsService.generateSummaryTable(
-      body.userJwtData,
+      query.groupId,
       query.month,
       query.year,
+      query.type,
     );
     return res
       .set('Content-Disposition', `attachment; filename=example.xlsx`)
@@ -59,9 +60,10 @@ export class VisitingsController {
   @Get('/summaryData')
   getSummary(@Query() query: any, @Body() body) {
     return this.visitingsService.getSummary(
-      body.userJwtData,
+      query.groupId,
       query.month,
       query.year,
+      query.type,
     );
   }
 }

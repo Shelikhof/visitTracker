@@ -28,7 +28,7 @@ export class GroupsService {
     //проверка на наличие группы с таким названием
     await this.checkGroupName(createGroupDto.name);
     //проверка на наличие куратора
-    const candidateCurator = await this.usersService.checkCurator(
+    const candidateCurator = await this.usersService.checkCandidateCurator(
       createGroupDto?.curatorId,
     );
 
@@ -92,7 +92,7 @@ export class GroupsService {
       updateGroupDto?.curatorId &&
       currentCurator?.id !== updateGroupDto?.curatorId
     ) {
-      candidateCurator = await this.usersService.checkCurator(
+      candidateCurator = await this.usersService.checkCandidateCurator(
         updateGroupDto?.curatorId,
       );
     }
@@ -177,9 +177,9 @@ export class GroupsService {
   }
 
   //получить инфо о группе для куратора (студенты, название, старосты)
-  async getInfo(curatorId: string) {
+  async getInfo(groupId: string) {
     const group = await this.groupRepository.findOne({
-      where: { curatorId: curatorId },
+      where: { id: groupId },
       include: [
         {
           model: User,
@@ -187,7 +187,7 @@ export class GroupsService {
           order: [['fullName', 'ASC']],
         },
       ],
-      attributes: ['id', 'name'],
+      attributes: ['id', 'name', 'isBudget'],
     });
     if (!group) throw new BadRequestException('group not found');
 
@@ -213,6 +213,7 @@ export class GroupsService {
     const data = {
       id: group.dataValues.id,
       name: group.dataValues.name,
+      isBudget: group.dataValues.isBudget,
       students: students,
       praepostors: formattedPraepostors,
     };
@@ -221,11 +222,11 @@ export class GroupsService {
 
   async editGroup(dto: EditGroupDto) {
     //проверка на наличие куратора
-    const curator = await this.usersService.findByPk(dto.userJwtData.id);
-    if (!curator) throw new BadRequestException('curator not found');
+    // const curator = await this.usersService.findByPk(dto.userJwtData.id);
+    // if (!curator) throw new BadRequestException('curator not found');
 
     //получение информации о группе
-    const groupInfo = await this.getInfo(curator.id);
+    const groupInfo = await this.getInfo(dto.groupId);
     if (!groupInfo) throw new BadRequestException('group not found');
 
     const group = await this.groupRepository.findByPk(groupInfo.id);
@@ -283,6 +284,7 @@ export class GroupsService {
 
     if (dto.name) {
       group.name = dto.name;
+      group.isBudget = dto.isBudget;
       await group.save();
     }
 
@@ -316,7 +318,7 @@ export class GroupsService {
     return;
   }
 
-  async addNewStudentsFromFile(file: Express.Multer.File, curatorId: string) {
+  async addNewStudentsFromFile(file: Express.Multer.File, groupId: string) {
     const workbook = new exceljs.Workbook();
 
     await workbook.xlsx.load(file.buffer);
@@ -331,7 +333,7 @@ export class GroupsService {
     }
 
     const group = await this.groupRepository.findOne({
-      where: { curatorId },
+      where: { id: groupId },
       raw: true,
     });
     if (!group) throw new BadRequestException('group not found');

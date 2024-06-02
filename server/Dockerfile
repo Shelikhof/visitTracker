@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+COPY summaryTemplate.xlsx ./
+
 COPY ./dist ./dist
 
 CMD ["npm", "run", "start"]

@@ -33,21 +33,21 @@ export default class GroupService {
     return response.data;
   }
 
-  static async getGroupInfo() {
-    const response = await $api.get<IGetGroupInfoResponse>("/groups/info");
+  static async getGroupInfo(groupId: string) {
+    const response = await $api.get<IGetGroupInfoResponse>("/groups/info/" + groupId);
     return response.data;
   }
 
-  static async editGroupInfo(name: string, praepostors: IPraepostor[] | null = [], students: IStudent[] | null = []) {
-    const response = await $api.patch("/groups/edit", { name, praepostors, students });
+  static async editGroupInfo(name: string, praepostors: IPraepostor[] | null = [], students: IStudent[] | null = [], groupId: string, isBudget: boolean) {
+    const response = await $api.patch("/groups/edit", { name, praepostors, students, groupId, isBudget });
     return response.data;
   }
 
-  static async uploadStudentFromFile(file: File) {
+  static async uploadStudentFromFile(file: File, groupId: string) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await $api.post("/groups/uploadFile", formData, {
+    const response = await $api.post(`/groups/${groupId}/uploadFile`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

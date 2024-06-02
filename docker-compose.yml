@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  # Frontend (React + Vite)
+  #Frontend (React + Vite)
   client:
     build:
       context: ./client
@@ -23,7 +23,7 @@ services:
     ports:
       - "8080:8080"
     restart: always
-    command: npm run start
+    command: npm run start:dev
 
   # Database
   mysql:
@@ -34,6 +34,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "0vSy9U74x7cp"
       MYSQL_DATABASE: "visittracker"
+      MYSQL_DATA: /var/lib/mysql
     volumes:
       - mysqldata:/var/lib/mysql
     restart: always

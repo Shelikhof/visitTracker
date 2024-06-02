@@ -6,6 +6,7 @@ import { isAxiosError } from "axios";
 import { ERRORS } from "../../variables/errors";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { IGetGroupInfoResponse } from "../../api/interfaces/IGroupService.interface";
+import useSelectedGroupInfoStore from "../../store/selectedGroupInfo.store";
 interface IAddStudentFilePopUpProps {
   setIsOpen: (value: boolean) => void;
   isOpen: boolean;
@@ -13,6 +14,8 @@ interface IAddStudentFilePopUpProps {
 }
 
 const AddStudentFilePopUp: React.FC<IAddStudentFilePopUpProps> = ({ isOpen, setIsOpen, refetch }) => {
+  const group = useSelectedGroupInfoStore((state) => state.group);
+
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [error, setError] = React.useState<string>("");
 
@@ -25,7 +28,7 @@ const AddStudentFilePopUp: React.FC<IAddStudentFilePopUpProps> = ({ isOpen, setI
     if (!selectedFile) return;
 
     try {
-      await GroupService.uploadStudentFromFile(selectedFile);
+      await GroupService.uploadStudentFromFile(selectedFile, group?.id || "");
       refetch();
       setIsOpen(false);
     } catch (error) {

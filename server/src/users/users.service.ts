@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { Op } from 'sequelize';
 import { ValidationErrorException } from 'src/exceptions/validation.exception';
 import { BotService } from 'src/bot/bot.service';
+import { log } from 'console';
 
 @Injectable()
 export class UsersService {
@@ -29,8 +30,9 @@ export class UsersService {
     page: number = 1,
     limit: number = 10,
     query: string = '',
-    role: string | undefined = undefined,
+    role: string[] | undefined = undefined,
   ) {
+    log(role);
     const { count, rows } = await this.userRepository.findAndCountAll({
       limit: +limit,
       offset: (+page - 1) * +limit,
@@ -65,14 +67,17 @@ export class UsersService {
     return user;
   }
 
-  async checkCurator(id: string | undefined = '') {
+  async checkCandidateCurator(id: string | undefined = '') {
     //проверка на наличие куратора
     const candidateCurator = await this.userRepository.findOne({
       where: { id: id },
     });
     if (id) {
       if (!candidateCurator) throw new BadRequestException('curator not found');
-      if (candidateCurator?.role !== 'none')
+      if (
+        candidateCurator?.role !== 'none' &&
+        candidateCurator?.role !== 'curator'
+      )
         throw new ValidationErrorException(null, 'curator has other role');
     }
     return candidateCurator;

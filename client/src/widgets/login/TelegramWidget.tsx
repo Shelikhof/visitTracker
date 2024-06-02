@@ -26,7 +26,7 @@ const TelegramWidget = () => {
       }
     }
   };
-  return <TelegramLoginButton dataOnauth={handleTelegramResponse} botName="visittrackerbot" lang="ru" />;
+  return <TelegramLoginButton dataOnauth={handleTelegramResponse} botName={import.meta.env.VITE_BOT_NAME} lang="ru" />;
 };
 
 export { TelegramWidget };

@@ -4,10 +4,17 @@ import { LogInDto } from './dto/login.dto';
 import { ValidationErrorException } from 'src/exceptions/validation.exception';
 import { JwtService } from '@nestjs/jwt';
 import { TokenService } from './token.service';
+import { InjectModel } from '@nestjs/sequelize';
+import { Group } from 'src/groups/entities/group.entity';
+import { Praepostor } from 'src/groups/entities/praepostor.entity';
+import { log } from 'console';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectModel(Group) private readonly groupRepository: typeof Group,
+    @InjectModel(Praepostor)
+    private readonly praepostorRepository: typeof Praepostor,
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
   ) {}
@@ -16,6 +23,9 @@ export class AuthService {
     const candidateUser = await this.usersService.findOneByTgId(
       logInDto.userData.id,
     );
+    let userGroup = null;
+    if (candidateUser.role === 'curator')
+      userGroup = await this.getGroups(candidateUser.id, candidateUser.role);
     if (candidateUser) {
       return {
         tokens: this.tokenService.generateToken({
@@ -26,6 +36,7 @@ export class AuthService {
           username: candidateUser.username,
           role: candidateUser.role,
           fullName: candidateUser.fullName,
+          groups: userGroup,
         },
       };
     }
@@ -74,11 +85,49 @@ export class AuthService {
 
   //получение данных пользователя по токену
   async getMe(id: string) {
-    const user = await this.usersService.findByPk(id);
+    const user = await this.usersService.findOne(id);
+    let userGroup = null;
+    if (user.role === 'curator' || user.role === 'praepostor')
+      userGroup = await this.getGroups(user.id, user.role);
     return {
-      role: user.role,
       username: user.username,
+      role: user.role,
       fullName: user.fullName,
+      groups: userGroup,
     };
+  }
+
+  private async getGroups(id: string, role: string) {
+    log(id, role);
+    let groups = null;
+    if (role === 'curator') {
+      groups = await this.groupRepository.findAll({
+        where: { curatorId: id },
+        attributes: ['id', 'name'],
+        raw: true,
+      });
+    }
+
+    if (role === 'praepostor') {
+      const praepostor = await this.praepostorRepository.findOne({
+        where: { userId: id },
+        raw: true,
+      });
+
+      log(praepostor.groupId);
+
+      groups = await this.groupRepository.findAll({
+        where: { id: praepostor.groupId },
+        attributes: ['id', 'name'],
+        raw: true,
+      });
+    }
+
+    groups.forEach((group) => {
+      group['value'] = group.name;
+      delete group.name;
+    });
+
+    return groups;
   }
 }

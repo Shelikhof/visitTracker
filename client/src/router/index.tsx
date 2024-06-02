@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { GroupPage, GroupsPage, NotFoundPage, ReportPage, SummaryPage, UsersPage } from "../pages";
+import { DevPage, GroupPage, GroupsPage, NotFoundPage, ReportPage, SummaryPage, UsersPage } from "../pages";
 import LoginRouter from "./LoginRouter";
 import useUserDataStore from "../store/userData.store";
 import roleValidator from "../utils/roleValidator";
@@ -10,7 +10,7 @@ const AppRouter = () => {
 
   return (
     <Routes>
-      {/* <Route path="/dev" element={<DevPage />} /> */}
+      <Route path="/dev" element={<DevPage />} />
       <Route path="/login/*" element={<LoginRouter />} />
       <Route path="/users" element={roleValidator(userData?.role || "none", ["admin"], <UsersPage />, <Navigate to={REDIRECT[userData?.role || "none"]} />)} />
       <Route path="/groups" element={roleValidator(userData?.role || "none", ["admin"], <GroupsPage />, <Navigate to={REDIRECT[userData?.role || "none"]} />)} />

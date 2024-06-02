@@ -43,7 +43,7 @@ const SummaryFullNameList: React.FC<ISummaryFullNameList> = ({ students }) => {
       {Object.keys(students).map((student) => (
         <li key={student} className={styles["fullName-item"]}>
           <p>{index++}</p>
-          <p>{sliceString(student, 15)}</p>
+          <p>{sliceString(student, 17)}</p>
         </li>
       ))}
     </ul>

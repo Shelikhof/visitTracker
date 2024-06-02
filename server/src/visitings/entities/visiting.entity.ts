@@ -14,6 +14,7 @@ interface ICreateVisiting {
   isVisit: boolean;
   isRespectfulReason: boolean;
   groupId: string;
+  isEat: boolean;
   date?: Date;
 }
 
@@ -34,6 +35,13 @@ export class Visiting extends Model<Visiting, ICreateVisiting> {
     defaultValue: true,
   })
   isVisit: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+    defaultValue: null,
+  })
+  isEat: boolean;
 
   @Column({
     type: DataType.BOOLEAN,

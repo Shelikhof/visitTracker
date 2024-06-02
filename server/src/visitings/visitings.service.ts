@@ -11,6 +11,7 @@ import * as exceljs from 'exceljs';
 import { log } from 'console';
 import { User } from 'src/users/entities/user.entity';
 import { BotService } from 'src/bot/bot.service';
+import * as path from 'path';
 
 @Injectable()
 export class VisitingsService {
@@ -24,10 +25,14 @@ export class VisitingsService {
     private readonly botService: BotService,
   ) {}
   async create(createVisitingDto: CreateVisitingDto) {
-    const group = await this.getGroupByRoleAndId(
-      createVisitingDto.userJwtData.role,
-      createVisitingDto.userJwtData.id,
-    );
+    // const group = await this.getGroupByRoleAndId(
+    //   createVisitingDto.userJwtData.role,
+    //   createVisitingDto.userJwtData.id,
+    // );
+    const group = await this.groupRepository.findOne({
+      where: { id: createVisitingDto.groupId },
+      raw: true,
+    });
 
     const { startDay, endDay } = this.getTodayStartEnd();
     log(startDay, endDay);
@@ -40,6 +45,7 @@ export class VisitingsService {
       raw: true,
     });
 
+    log(createVisitingDto);
     //если посещения были, то сохраняем изменения, иначе создаём новые записи
     if (visitings.length > 0) {
       for (const student of createVisitingDto.students) {
@@ -51,6 +57,7 @@ export class VisitingsService {
         });
 
         visiting.isVisit = student.isVisit;
+        visiting.isEat = student.isEat;
         visiting.isRespectfulReason =
           !student.isVisit && student.isRespectfulReason;
         await visiting.save();
@@ -63,6 +70,7 @@ export class VisitingsService {
           date: this.getTodayWithTimeZone(),
           studentId: student.id,
           groupId: group.id,
+          isEat: student.isEat,
         });
       }
     }
@@ -90,11 +98,16 @@ export class VisitingsService {
   }
 
   //получение отчёта за сегодня
-  async getReport(userJwtData: any) {
-    const group = await this.getGroupByRoleAndId(
-      userJwtData.role,
-      userJwtData.id,
-    );
+  async getReport(groupId: string) {
+    // const group = await this.getGroupByRoleAndId(
+    //   userJwtData.role,
+    //   userJwtData.id,
+    // );
+
+    const group = await this.groupRepository.findOne({
+      where: { id: groupId },
+      raw: true,
+    });
 
     const students = await this.studentRepository.findAll({
       where: { groupId: group.id },
@@ -125,9 +138,11 @@ export class VisitingsService {
           isVisit: !!item.isVisit,
           isRespectfulReason: !!item.isRespectfulReason,
           isIP: !!item['student.isIP'],
+          isEat: !!item.isEat,
         }))
         .sort((a, b) => a.fullName.localeCompare(b.fullName));
       return {
+        isBudget: !!group.isBudget,
         date: this.getTodayWithTimeZone(),
         students: transformedVisitings,
       };
@@ -140,19 +155,31 @@ export class VisitingsService {
         fullName: student.fullName,
         isIP: !!student.isIP,
         isVisit: true,
+        isEat: group.isBudget ? true : null,
         isRespectfulReason: null,
       }))
       .sort((a, b) => a.fullName.localeCompare(b.fullName));
 
-    return { date: this.getTodayWithTimeZone(), students: formattedStudents };
+    return {
+      isBudget: !!group.isBudget,
+      date: this.getTodayWithTimeZone(),
+      students: formattedStudents,
+    };
   }
 
-  //создание отчёта
-  async getSummary(userJwtData, month: string, year: string) {
-    const group = await this.getGroupByRoleAndId(
-      userJwtData.role,
-      userJwtData.id,
-    );
+  //создание сводки за месяц по типу
+  async getSummary(groupId: string, month: string, year: string, type: string) {
+    log(type);
+    // const group = await this.getGroupByRoleAndId(
+    //   userJwtData.role,
+    //   userJwtData.id,
+    // );
+
+    const group = await this.groupRepository.findOne({
+      where: { id: groupId },
+      raw: true,
+    });
+
     const students = await this.studentRepository.findAll({
       where: { groupId: group.id },
       order: [['fullName', 'ASC']],
@@ -188,13 +215,22 @@ export class VisitingsService {
           if (visitings[visitingsIndex]?.isVisit == null) {
             return `--`;
           }
-          const value = !!visitings[visitingsIndex].isVisit
-            ? 'О'
-            : !!visitings[visitingsIndex].isRespectfulReason
-              ? 'УП'
-              : 'Н';
-          visitingsIndex += 1;
-          return value;
+
+          if (type === 'visitings') {
+            const value = !!visitings[visitingsIndex].isVisit
+              ? 'О'
+              : !!visitings[visitingsIndex].isRespectfulReason
+                ? 'УП'
+                : 'Н';
+            visitingsIndex += 1;
+            return value;
+          }
+
+          if (type === 'eatings') {
+            const value = !!visitings[visitingsIndex].isEat ? 'О' : 'Н';
+            visitingsIndex += 1;
+            return value;
+          }
         } else {
           return `--`;
         }
@@ -299,16 +335,23 @@ export class VisitingsService {
     return { firstDay, lastDay };
   }
 
-  async generateSummaryTable(userJwtData, month: string, year: string) {
+  async generateSummaryTable(
+    groupId: string,
+    month: string,
+    year: string,
+    type: string,
+  ) {
     const { dateData, studentsVisitings, group } = await this.getSummary(
-      userJwtData,
+      groupId,
       month,
       year,
+      type,
     );
 
     const tableTemplate = new exceljs.Workbook();
     await tableTemplate.xlsx.readFile(
-      __dirname + '\\..\\..\\summaryTemplate.xlsx',
+      // __dirname + '\\..\\..\\summaryTemplate.xlsx',
+      path.resolve(__dirname, '../../summaryTemplate.xlsx'),
     );
 
     const worksheet = tableTemplate.getWorksheet('шаблон');
@@ -317,7 +360,7 @@ export class VisitingsService {
     worksheet.getCell(1, 3).value =
       `Отделение "Ярославское-3" по адресу: Хибиннский проезд, дом 11`;
     worksheet.getCell(2, 1).value =
-      `                                                                                                      Табель учета питания группы № ${group.name}                                            ${this.monthEnum[dateData.month]} ${dateData.year}г.`;
+      `                                                                                                      ${type === 'visitings' ? 'Табель посещения' : 'Табель учета питания'} группы № ${group.name}                                            ${this.monthEnum[dateData.month]} ${dateData.year}г.`;
 
     worksheet.getCell(34, 2).value =
       `   Куратор                         _____________________________________             ${this.formatName(group.curator)}																	    `;
@@ -368,13 +411,17 @@ export class VisitingsService {
 
   //форматирование имени из полного формата ФИО в И.О.Фамилия
   formatName(name: string) {
-    const parts = name.trim().split(' ');
-    const firstNameInitial = parts[0];
-    const middleNameInitial = parts[1];
-    const lastName = parts[2];
-    if (lastName)
-      return `${lastName[0] || ''}.${middleNameInitial[0] || ''}.${firstNameInitial || ''}`;
-    return `${middleNameInitial[0] || ''}.${firstNameInitial || ''}`;
+    try {
+      const parts = name.trim().split(' ');
+      const firstNameInitial = parts[0];
+      const middleNameInitial = parts[1];
+      const lastName = parts[2];
+      if (lastName)
+        return `${lastName[0] || ''}.${middleNameInitial[0] || ''}.${firstNameInitial || ''}`;
+      return `${middleNameInitial[0] || ''}.${firstNameInitial || ''}`;
+    } catch (e) {
+      return name;
+    }
   }
 
   generateVisitingMessage(
@@ -383,7 +430,6 @@ export class VisitingsService {
     studentsData: Student[],
   ) {
     const date = this.getTodayWithTimeZone();
-    log(date + 'asdasd');
     const formatedDate = `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
 
     const IP = [];

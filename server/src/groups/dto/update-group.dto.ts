@@ -15,8 +15,6 @@ export class EditGroupDto {
     fullName: string;
     username: string;
   }[];
-  userJwtData: {
-    id: string;
-    role: string;
-  };
+  groupId: string;
+  isBudget: boolean;
 }

@@ -2,7 +2,7 @@ import $api from ".";
 import { IUserResponse, IUsersResponse, role } from "./interfaces/IUserService.interface";
 
 export default class UserService {
-  static async getAllUsers(page: number = 1, limit: number = 10, role: role | null = null, q: string = "") {
+  static async getAllUsers(page: number = 1, limit: number = 10, role: role[] | role | null = null, q: string = "") {
     const response = await $api.get<IUsersResponse>("/users/", {
       params: {
         page,

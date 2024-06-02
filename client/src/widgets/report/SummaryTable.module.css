@@ -6,7 +6,7 @@
 
 .fullName-item {
   display: grid;
-  grid-template-columns: 20px 140px;
+  grid-template-columns: 20px 200px;
 }
 
 .fullName-list {

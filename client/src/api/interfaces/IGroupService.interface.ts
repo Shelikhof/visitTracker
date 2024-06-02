@@ -20,6 +20,7 @@ export interface IGetGroupByIdResponse {
 export interface IGetGroupInfoResponse {
   id: string;
   name: string;
+  isBudget: boolean;
   praepostors: IPraepostor[];
   students: IStudent[];
 }

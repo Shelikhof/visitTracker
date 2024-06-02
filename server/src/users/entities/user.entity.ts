@@ -1,4 +1,11 @@
-import { Column, Table, DataType, Model, HasOne } from 'sequelize-typescript';
+import {
+  Column,
+  Table,
+  DataType,
+  Model,
+  HasOne,
+  HasMany,
+} from 'sequelize-typescript';
 import { Group } from 'src/groups/entities/group.entity';
 import { Praepostor } from 'src/groups/entities/praepostor.entity';
 
@@ -44,8 +51,8 @@ export class User extends Model<User, ICreateUser> {
   })
   role: string;
 
-  @HasOne(() => Group)
-  group: Group;
+  @HasMany(() => Group)
+  groups: Group;
 
   @HasOne(() => Praepostor, { onDelete: 'CASCADE' })
   praepostor: Praepostor;

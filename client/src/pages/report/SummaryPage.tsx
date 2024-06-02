@@ -9,22 +9,24 @@ import styles from "./SummaryPage.module.css";
 const SummaryPage = () => {
   const month = useSummaryParamsStore((state) => state.month);
   const year = useSummaryParamsStore((state) => state.year);
+  const type = useSummaryParamsStore((state) => state.type);
+  const groupId = useSummaryParamsStore((state) => state.groupId);
 
   const [summaryData, setSummaryData] = React.useState<ISummaryData | null>(null);
 
   const fetchSummaryData = async () => {
-    if (!month || !year) return;
-    const data = await ReportService.getSummaryData(month, year);
+    if (!month || !year || !type || !groupId) return;
+    const data = await ReportService.getSummaryData(month, year, type, groupId);
     setSummaryData(data);
   };
 
   React.useEffect(() => {
     fetchSummaryData();
-  }, [month, year]);
+  }, [month, year, type, groupId]);
 
-  document.title = "Сводка посещаемости за месяц";
+  document.title = "Сводка за месяц";
   return (
-    <Layout header="Сводка посещаемости за месяц">
+    <Layout header="Сводка за месяц">
       <Summary />
       <div className={styles["table"]}>{summaryData && <SummaryTable data={summaryData} />}</div>
     </Layout>

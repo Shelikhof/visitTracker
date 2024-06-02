@@ -25,7 +25,7 @@ const GroupPopUp: React.FC<IGroupPopUpProps> = ({ isOpen, setIsOpen, groupId, qu
 
   //получить пользователей без роли по поиску
   const fetchData = async (value: string) => {
-    const data = await UserService.getAllUsers(1, 10, "none", value);
+    const data = await UserService.getAllUsers(1, 10, ["none", "curator"], value);
     return data.data;
   };
 

@@ -4,6 +4,7 @@
   padding: 5px;
   border: 2px solid var(--gray-1);
   background: var(--white);
+  /* background: #000; */
   border-radius: 10px;
   max-height: 250px;
   overflow-y: auto;

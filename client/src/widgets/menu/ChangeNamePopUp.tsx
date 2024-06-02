@@ -19,6 +19,7 @@ const ChangeNamePopUp: React.FC<IChangeNamePopUpProps> = ({ isOpen, setIsOpen })
 
   const handleSubmit = async () => {
     await UserService.changeName(fullName);
+    setIsOpen(false);
   };
 
   return (

@@ -1,9 +1,11 @@
+import { IGroupItem } from "../../interfaces/index.interface";
 import { role } from "./IUserService.interface";
 
 export interface IAuthResponse {
   fullName: string;
   username: string;
   role: role;
+  groups: IGroupItem[];
 }
 
 export interface IAuthError {

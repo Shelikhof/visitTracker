@@ -68,7 +68,7 @@ const DevPage = () => {
       <br />
       <br />
       <br />
-      <Button onClick={onCLick} variant="red">
+      <Button onClick={onCLick} variant="gray" disabled>
         АЙАААА
       </Button>
       <br />

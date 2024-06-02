@@ -1,4 +1,5 @@
 export interface IReportResponse {
+  isBudget: boolean;
   date: Date;
   students: IReportStudent[];
 }
@@ -8,6 +9,7 @@ export interface IReportStudent {
   fullName: string;
   isIP: boolean;
   isVisit: boolean;
+  isEat: boolean;
   isRespectfulReason: boolean | null;
 }
 

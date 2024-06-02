@@ -6,6 +6,7 @@ import { log } from 'console';
 async function bootstrap() {
   process.env.TZ = 'Europe/Moscow';
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.enableCors({ origin: process.env.CLIENT_URL, credentials: true });
   app.use(cookieParser());
   await app.listen(process.env.PORT);

@@ -3,32 +3,36 @@ import $api from ".";
 import { IReportResponse, IReportStudent, ISummaryData } from "./interfaces/IReportService.interface";
 
 export default class ReportService {
-  static async getReport() {
-    const response = await $api.get<IReportResponse>("/report");
+  static async getReport(groupId: string) {
+    const response = await $api.get<IReportResponse>("/report/" + groupId);
     return response.data;
   }
 
-  static async saveReport(students: IReportStudent[]) {
-    const response = await $api.post("/report", { students });
+  static async saveReport(students: IReportStudent[], groupId: string) {
+    const response = await $api.post("/report", { students, groupId });
     return response.data;
   }
 
-  static async getSummaryFile(month: string, year: string): Promise<AxiosResponse<ArrayBuffer>> {
+  static async getSummaryFile(month: string, year: string, type: string, groupId: string): Promise<AxiosResponse<ArrayBuffer>> {
     const response = await $api.get("/summary", {
       params: {
         month,
         year,
+        type,
+        groupId,
       },
       responseType: "arraybuffer",
     });
     return response;
   }
 
-  static async getSummaryData(month: string, year: string) {
+  static async getSummaryData(month: string, year: string, type: string, groupId: string) {
     const response = await $api.get<ISummaryData>("/summaryData", {
       params: {
         month,
         year,
+        type,
+        groupId,
       },
     });
     return response.data;

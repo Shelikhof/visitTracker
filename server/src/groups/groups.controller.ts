@@ -33,9 +33,9 @@ export class GroupsController {
   //получение информации о группе для куратора (студенты, название старосты)
   @Roles('curator')
   @UseGuards(RolesGuard)
-  @Get('/info')
-  getInfo(@Body() body: any) {
-    return this.groupsService.getInfo(body.userJwtData.id);
+  @Get('/info/:id')
+  getInfo(@Param('id') id: string) {
+    return this.groupsService.getInfo(id);
   }
 
   //изменение информации о группе для куратора
@@ -83,11 +83,12 @@ export class GroupsController {
   @Roles('curator')
   @UseGuards(RolesGuard)
   @UseInterceptors(FileInterceptor('file'))
-  @Post('uploadFile')
+  @Post(':id/uploadFile')
   async uploadNewStudentsFromFile(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: any,
+    @Param('id') groupId: string,
   ) {
-    return this.groupsService.addNewStudentsFromFile(file, req.userJwtData.id);
+    return this.groupsService.addNewStudentsFromFile(file, groupId);
   }
 }
