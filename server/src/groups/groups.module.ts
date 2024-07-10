@@ -19,5 +19,6 @@ import { BotModule } from 'src/bot/bot.module';
   ],
   controllers: [GroupsController],
   providers: [GroupsService],
+  exports: [GroupsService],
 })
 export class GroupsModule {}

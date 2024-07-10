@@ -62,7 +62,7 @@ export class UsersService {
   }
 
   async findByPk(id: string) {
-    const user = await this.userRepository.findByPk(id);
+    const user = await this.userRepository.findByPk(id, { raw: true });
     if (!user) throw new BadRequestException('user not found');
     return user;
   }

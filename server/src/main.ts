@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { log } from 'console';
+import { CronService } from './cron/cron.service';
 
 async function bootstrap() {
   process.env.TZ = 'Europe/Moscow';

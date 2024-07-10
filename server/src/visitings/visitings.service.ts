@@ -24,7 +24,22 @@ export class VisitingsService {
     private readonly praepostorRepository: typeof Praepostor,
     private readonly botService: BotService,
   ) {}
+
+  async hasReportToday(groupId: string): Promise<boolean> {
+    const { startDay, endDay } = this.getTodayStartEnd();
+    const visitings = await this.visitingRepository.findAll({
+      where: {
+        groupId: groupId,
+        date: { [Op.between]: [startDay, endDay] },
+      },
+      raw: true,
+    });
+
+    return visitings.length > 0;
+  }
+
   async create(createVisitingDto: CreateVisitingDto) {
+    // return;
     // const group = await this.getGroupByRoleAndId(
     //   createVisitingDto.userJwtData.role,
     //   createVisitingDto.userJwtData.id,
@@ -45,7 +60,7 @@ export class VisitingsService {
       raw: true,
     });
 
-    log(createVisitingDto);
+    // log(createVisitingDto);
     //если посещения были, то сохраняем изменения, иначе создаём новые записи
     if (visitings.length > 0) {
       for (const student of createVisitingDto.students) {
@@ -56,22 +71,38 @@ export class VisitingsService {
           },
         });
 
-        visiting.isVisit = student.isVisit;
-        visiting.isEat = student.isEat;
+        if (group.practiceMode) {
+          visiting.isVisitPractice = student.isVisit;
+        } else {
+          visiting.isVisit = student.isVisit;
+          visiting.isEat = student.isEat;
+        }
+
         visiting.isRespectfulReason =
           !student.isVisit && student.isRespectfulReason;
         await visiting.save();
       }
     } else {
       for (const student of createVisitingDto.students) {
-        await this.visitingRepository.create({
-          isVisit: student.isVisit,
-          isRespectfulReason: !student.isVisit && student.isRespectfulReason,
-          date: this.getTodayWithTimeZone(),
-          studentId: student.id,
-          groupId: group.id,
-          isEat: student.isEat,
-        });
+        if (group.practiceMode) {
+          await this.visitingRepository.create({
+            isVisitPractice: student.isVisit,
+            isRespectfulReason: !student.isVisit && student.isRespectfulReason,
+            date: this.getTodayWithTimeZone(),
+            studentId: student.id,
+            groupId: group.id,
+            isEat: null,
+          });
+        } else {
+          await this.visitingRepository.create({
+            isVisit: student.isVisit,
+            isRespectfulReason: !student.isVisit && student.isRespectfulReason,
+            date: this.getTodayWithTimeZone(),
+            studentId: student.id,
+            groupId: group.id,
+            isEat: student.isEat,
+          });
+        }
       }
     }
 
@@ -118,8 +149,7 @@ export class VisitingsService {
 
     const { startDay, endDay } = this.getTodayStartEnd();
 
-    log(startDay, endDay);
-
+    log(startDay + ' zzz ' + endDay);
     const visitings = await this.visitingRepository.findAll({
       where: {
         groupId: group.id,
@@ -129,20 +159,23 @@ export class VisitingsService {
       raw: true,
     });
 
+    // log(visitings);
     //если посещения были, то отправляем данные из бд, иначе отправляем массив с исходными данными (студенты, флаг isVisit = true)
     if (visitings.length > 0) {
       const transformedVisitings = visitings
         .map((item) => ({
           id: item['student.id'],
           fullName: item['student.fullName'],
-          isVisit: !!item.isVisit,
+          isVisit:
+            item.isVisit !== null ? !!item.isVisit : !!item.isVisitPractice,
           isRespectfulReason: !!item.isRespectfulReason,
           isIP: !!item['student.isIP'],
-          isEat: !!item.isEat,
+          isEat: item.isEat !== null ? !!item.isEat : null,
         }))
         .sort((a, b) => a.fullName.localeCompare(b.fullName));
       return {
         isBudget: !!group.isBudget,
+        practiceMode: !!group.practiceMode,
         date: this.getTodayWithTimeZone(),
         students: transformedVisitings,
       };
@@ -155,13 +188,14 @@ export class VisitingsService {
         fullName: student.fullName,
         isIP: !!student.isIP,
         isVisit: true,
-        isEat: group.isBudget ? true : null,
+        isEat: group.isBudget && !group.practiceMode ? true : null,
         isRespectfulReason: null,
       }))
       .sort((a, b) => a.fullName.localeCompare(b.fullName));
 
     return {
       isBudget: !!group.isBudget,
+      practiceMode: !!group.practiceMode,
       date: this.getTodayWithTimeZone(),
       students: formattedStudents,
     };
@@ -212,23 +246,45 @@ export class VisitingsService {
       //форматирование посещений (если данных нет, то ставим --, иначе isVisit), проходимся по массиву days, потому что необходимо скорректировать посещения по дням в месяце
       const monthVisitings = days.map((item) => {
         if (new Date(visitings[visitingsIndex]?.date).getDate() == item) {
-          if (visitings[visitingsIndex]?.isVisit == null) {
+          if (
+            visitings[visitingsIndex]?.isVisit == null &&
+            visitings[visitingsIndex]?.isVisitPractice == null
+          ) {
             return `--`;
           }
 
           if (type === 'visitings') {
-            const value = !!visitings[visitingsIndex].isVisit
-              ? 'О'
-              : !!visitings[visitingsIndex].isRespectfulReason
-                ? 'УП'
-                : 'Н';
-            visitingsIndex += 1;
+            let value = null;
+            if (visitings[visitingsIndex].isVisit) {
+              value = 'О';
+            }
+            if (visitings[visitingsIndex].isVisitPractice) {
+              value = 'УП';
+            }
+            log(visitings[visitingsIndex].isRespectfulReason);
+            if (value !== null) return value;
+            value = !!visitings[visitingsIndex].isRespectfulReason ? 'УВ' : 'Н';
+            // value = !!visitings[visitingsIndex].isVisit
+            //   ? 'О'
+            //   : !!visitings[visitingsIndex].isRespectfulReason
+            //     ? 'УП'
+            //     : 'Н';
+            // visitingsIndex += 1;
             return value;
           }
 
           if (type === 'eatings') {
-            const value = !!visitings[visitingsIndex].isEat ? 'О' : 'Н';
+            let value = null;
+            log(visitings[visitingsIndex].isEat);
+            if (visitings[visitingsIndex].isEat !== null)
+              value = !!visitings[visitingsIndex].isEat ? 'О' : 'Н';
+            if (
+              value === null &&
+              visitings[visitingsIndex].isVisitPractice !== null
+            )
+              value = !!visitings[visitingsIndex].isVisitPractice ? 'УП' : 'Н';
             visitingsIndex += 1;
+            if (value === null) value = 'Н';
             return value;
           }
         } else {
@@ -284,20 +340,20 @@ export class VisitingsService {
     }
   }
 
-  private getTodayStartEnd() {
+  private getTodayStartEnd(offset = 0) {
     const today = this.getTodayWithTimeZone();
     log(today);
     const startDay = new Date(
       today.getFullYear(),
       today.getMonth(),
       today.getDate() + 0,
-      Number(process.env.TIMEZONE) % 24,
+      offset % 24,
     );
     const endDay = new Date(
       today.getFullYear(),
       today.getMonth(),
       today.getDate() + 1,
-      Number(process.env.TIMEZONE) % 24,
+      offset % 24,
     );
     return { startDay, endDay };
   }
@@ -328,10 +384,10 @@ export class VisitingsService {
 
   private getFirstAndLastDayOfMonth(month: string, year: string) {
     const firstDay = new Date(`${month} 1, ${year}`);
-    firstDay.setHours(firstDay.getHours() + 3);
+    firstDay.setHours(firstDay.getHours() + Number(process.env.TIMEZONE));
     const lastDay = new Date(Number(year), firstDay.getMonth() + 1, 0);
     lastDay.setHours(23, 59, 59, 999);
-    lastDay.setHours(lastDay.getHours() + 3);
+    lastDay.setHours(lastDay.getHours() + Number(process.env.TIMEZONE));
     return { firstDay, lastDay };
   }
 

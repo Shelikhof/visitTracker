@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { LogInDto } from './dto/login.dto';
 import { ValidationErrorException } from 'src/exceptions/validation.exception';
-import { JwtService } from '@nestjs/jwt';
 import { TokenService } from './token.service';
 import { InjectModel } from '@nestjs/sequelize';
 import { Group } from 'src/groups/entities/group.entity';
@@ -24,7 +23,7 @@ export class AuthService {
       logInDto.userData.id,
     );
     let userGroup = null;
-    if (candidateUser.role === 'curator')
+    if (candidateUser?.role === 'curator')
       userGroup = await this.getGroups(candidateUser.id, candidateUser.role);
     if (candidateUser) {
       return {

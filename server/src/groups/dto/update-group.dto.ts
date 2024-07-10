@@ -9,6 +9,7 @@ export class EditGroupDto {
     id: string;
     fullName: string;
     isIP: boolean;
+    job: string | null;
   }[];
   praepostors: {
     id: string;
@@ -17,4 +18,5 @@ export class EditGroupDto {
   }[];
   groupId: string;
   isBudget: boolean;
+  practiceMode: boolean;
 }

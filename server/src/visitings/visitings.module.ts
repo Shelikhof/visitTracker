@@ -18,5 +18,6 @@ import { BotModule } from 'src/bot/bot.module';
     AuthModule,
     BotModule,
   ],
+  exports: [VisitingsService],
 })
 export class VisitingsModule {}

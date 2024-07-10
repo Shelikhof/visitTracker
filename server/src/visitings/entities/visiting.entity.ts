@@ -16,6 +16,7 @@ interface ICreateVisiting {
   groupId: string;
   isEat: boolean;
   date?: Date;
+  isVisitPractice?: boolean;
 }
 
 @Table({ tableName: 'visitings', timestamps: false })
@@ -31,8 +32,7 @@ export class Visiting extends Model<Visiting, ICreateVisiting> {
 
   @Column({
     type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: true,
+    allowNull: true,
   })
   isVisit: boolean;
 
@@ -49,6 +49,13 @@ export class Visiting extends Model<Visiting, ICreateVisiting> {
     defaultValue: null,
   })
   isRespectfulReason: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+    defaultValue: null,
+  })
+  isVisitPractice: boolean;
 
   @Column({
     type: DataType.DATE,

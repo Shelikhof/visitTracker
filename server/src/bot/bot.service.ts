@@ -14,6 +14,27 @@ export class BotService {
   //   await ctx.reply('тест');
   // }
   writeMessageToUser(id: number, message: string) {
-    this.bot.telegram.sendMessage(id, message);
+    try {
+      this.bot.telegram.sendMessage(id, message);
+    } catch (error) {
+      log(error);
+    }
+  }
+
+  writeMessageToUserWithLinkButton(
+    id: number,
+    message: string,
+    link: string,
+    label: string,
+  ) {
+    try {
+      this.bot.telegram.sendMessage(id, message, {
+        reply_markup: {
+          inline_keyboard: [[{ text: label, url: link }]],
+        },
+      });
+    } catch (error) {
+      log(error);
+    }
   }
 }

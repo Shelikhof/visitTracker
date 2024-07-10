@@ -1,9 +1,0 @@
-.search-debounce {
-  position: relative;
-}
-
-.dropdown-wrapper {
-  position: absolute;
-  top: calc(100% + 5px);
-  width: 100%;
-}

@@ -14,6 +14,7 @@ interface ICreateStudent {
   groupId: string;
   fullName: string;
   isIP: boolean;
+  job: string | null;
 }
 
 @Table({ tableName: 'students' })
@@ -36,6 +37,11 @@ export class Student extends Model<Student, ICreateStudent> {
     defaultValue: false,
   })
   isIP: boolean;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  job: string;
 
   @ForeignKey(() => Group)
   @Column({ type: DataType.UUID })

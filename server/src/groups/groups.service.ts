@@ -24,6 +24,15 @@ export class GroupsService {
     private readonly usersService: UsersService,
     private readonly botService: BotService,
   ) {}
+
+  async isPracticeMode(groupId: string): Promise<boolean> {
+    const group = await this.groupRepository.findOne({
+      where: { id: groupId },
+      raw: true,
+    });
+    return !!group.practiceMode;
+  }
+
   async create(createGroupDto: CreateGroupDto) {
     //проверка на наличие группы с таким названием
     await this.checkGroupName(createGroupDto.name);
@@ -57,6 +66,7 @@ export class GroupsService {
       where: {
         name: { [Op.like]: `%${query}%` },
       },
+      raw: true,
       order: [['name', 'ASC']],
       attributes: ['id', 'name'],
     });
@@ -167,6 +177,14 @@ export class GroupsService {
     return;
   }
 
+  async getPraepostors(groupId: string) {
+    const praepostors = await this.praepostorRepository.findAll({
+      where: { groupId: groupId },
+      raw: true,
+    });
+    return praepostors;
+  }
+
   async checkGroupName(name: string) {
     //проверка на наличие группы с таким названием
     const candidateGroup = await this.groupRepository.findOne({
@@ -187,7 +205,7 @@ export class GroupsService {
           order: [['fullName', 'ASC']],
         },
       ],
-      attributes: ['id', 'name', 'isBudget'],
+      attributes: ['id', 'name', 'isBudget', 'practiceMode'],
     });
     if (!group) throw new BadRequestException('group not found');
 
@@ -214,6 +232,7 @@ export class GroupsService {
       id: group.dataValues.id,
       name: group.dataValues.name,
       isBudget: group.dataValues.isBudget,
+      practiceMode: group.dataValues.practiceMode,
       students: students,
       praepostors: formattedPraepostors,
     };
@@ -221,7 +240,7 @@ export class GroupsService {
   }
 
   async editGroup(dto: EditGroupDto) {
-    //проверка на наличие куратора
+    //проверка на наличие куратора //удалено, чтоб один куратор мог иметь несколько групп
     // const curator = await this.usersService.findByPk(dto.userJwtData.id);
     // if (!curator) throw new BadRequestException('curator not found');
 
@@ -239,7 +258,7 @@ export class GroupsService {
     //если данные есть только во втором, то это данные, которые надо удалить
     //если данные есть в обоих, то это данные, которые надо обновить
 
-    const praepostorCompare = this.compareArrays(
+    const praepostorCompare = this.compareArrays<typeof praepostorsDTO>(
       praepostorsDTO,
       praepostorsGroup,
     );
@@ -284,14 +303,18 @@ export class GroupsService {
 
     if (dto.name) {
       group.name = dto.name;
-      group.isBudget = dto.isBudget;
+      group.isBudget = dto.isBudget === null ? true : dto.isBudget;
+      group.practiceMode = dto.practiceMode === null ? true : dto.practiceMode;
       await group.save();
     }
 
     const studentsDTO = dto.students;
     const studentsGroup = groupInfo.students;
 
-    const studentsCompare = this.compareArrays(studentsDTO, studentsGroup);
+    const studentsCompare = this.compareArrays<typeof studentsDTO>(
+      studentsDTO,
+      studentsGroup,
+    );
 
     //запись новых студентов
     for (const student of studentsCompare.onlyInFirst) {
@@ -299,6 +322,7 @@ export class GroupsService {
         groupId: groupInfo.id,
         fullName: student.fullName,
         isIP: student.isIP,
+        job: student.job,
       });
     }
 
@@ -313,6 +337,7 @@ export class GroupsService {
       const studentData = await this.studentRepository.findByPk(student.id);
       studentData.isIP = student.isIP;
       studentData.fullName = student.fullName;
+      studentData.job = student.isIP ? student.job : null;
       await studentData.save();
     }
     return;
@@ -356,16 +381,17 @@ export class GroupsService {
     return;
   }
 
-  private compareArrays(arr1, arr2) {
+  //фукция сравнения двух массивов и получение информации о пересечении (для сохранения группы, сравнение студентов группе)
+  private compareArrays<T>(arr1, arr2) {
     const intersection = arr1.filter((item1) =>
       arr2.some((item2) => item1.id === item2.id),
-    );
+    ) as T;
     const onlyInFirst = arr1.filter(
       (item1) => !arr2.some((item2) => item1.id === item2.id),
-    );
+    ) as T;
     const onlyInSecond = arr2.filter(
       (item2) => !arr1.some((item1) => item1.id === item2.id),
-    );
+    ) as T;
 
     return {
       intersection,

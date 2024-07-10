@@ -12,6 +12,9 @@ import { VisitingsModule } from './visitings/visitings.module';
 import { Visiting } from './visitings/entities/visiting.entity';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { BotModule } from './bot/bot.module';
+import { CronService } from './cron/cron.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CronModule } from './cron/cron.module';
 
 @Module({
   imports: [
@@ -33,12 +36,15 @@ import { BotModule } from './bot/bot.module';
     TelegrafModule.forRoot({
       token: process.env.BOT_TOKEN,
     }),
+    ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,
     GroupsModule,
     VisitingsModule,
     BotModule,
+    CronModule,
   ],
   controllers: [],
+  providers: [CronService],
 })
 export class AppModule {}

@@ -1,0 +1,15 @@
+:root {
+  --lightblue-1: #c2e8ff; /* 300 */
+  --lightblue-2: #f3faff; /* 100 */
+  --darkBlue-1: #052b6a; /* 800 */
+  --darkBlue-2: #052355; /* 900 */
+  --blue: #5480b1; /* 500 */
+  --red-1: #e30613; /* 500 */
+  --red-2: #d60e1a; /* 600 */
+  --black: #000f22; /* 900 */
+  --lightGray: #f6f7f8; /* 100 */
+  --gray-1: #dadada; /* 300 */
+  --gray-2: #b5b5b5; /* 500 */
+  --white: #ffffff;
+  --speed: 250ms;
+}

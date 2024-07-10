@@ -34,6 +34,9 @@ export class Group extends Model<Group, ICreateGroup> {
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: true })
   isBudget: boolean;
 
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
+  practiceMode: boolean;
+
   @ForeignKey(() => User)
   @Column({ type: DataType.UUID, allowNull: true })
   curatorId: string;
