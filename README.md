@@ -9,4 +9,4 @@
 </ul>
 
 <p><span>Figma:</span> <a href="https://www.figma.com/design/A69OBEYplz5yPfzaQuDWvz/visitSystem?node-id=0-1&t=SjgbLFekYLwUu4By-1">https://www.figma.com/design/A69OBEYplz5yPfzaQuDWvz/visitSystem?node-id=0-1&t=SjgbLFekYLwUu4By-1</a></p>
-<p><span>WEB:</span> <a href="https://visittracker.ru/">https://visittracker.ru/</a></p>
+<p><span>WEB:</span> <a href="https://visittracker.ru/">https://visittracker.ru/</a> <span>Для доступа к функционалу сайта необходимо получить роль</span></p>
